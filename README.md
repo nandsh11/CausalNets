@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# CausalNets
+# causNet
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The goal of CausalNets is to …
+The goal of causNet is to …
 
 ## Installation
 
