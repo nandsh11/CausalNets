@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# causnet
+# CausalNets
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The goal of causnet is to …
+The goal of CausalNets is to …
 
 ## Installation
 
@@ -38,21 +38,9 @@ mydata = simdat(n.var = 5)
 links.s = sfun(mydata, alpha = 1)
 
 links.s
-#>   from to component
-#> 1    4  5         1
-#> 2    3  4         1
-#> 3    2  3         1
-#> 4    1  2         1
+
 
 netplot_jm(links.s)
-#> Loading required package: igraph
-#> 
-#> Attaching package: 'igraph'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     decompose, spectrum
-#> The following object is masked from 'package:base':
-#> 
-#>     union
+
 ```
 
