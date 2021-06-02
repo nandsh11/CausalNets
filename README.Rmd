@@ -39,7 +39,7 @@ install.packages("causnet")
 ## Example
 
 ```{r}
-library(causnet)
+library(CausalNets)
 
 # simulate data
 set.seed(1234)
