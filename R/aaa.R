@@ -31,9 +31,11 @@ mypp = function(mydata, alpha, n.var){
     for(p in 1:n.var){
       if(p != v){
         #if(p == n.var){}else{ # last node phenotype outout- not a parent
-          p.value = cor.test(mydata[, v], mydata[, p])$p.value
+          #p.value = cor.test(mydata[, v], mydata[, p])$p.value
+          p.value = cor(mydata[, v], mydata[, p])
           #p.value = cor.test(mydata[, v], mydata[, p])$estimate
-          if(p.value < alpha) pp[[v]] = c(pp[[v]], p)
+          #if(p.value < alpha) pp[[v]] = c(pp[[v]], p)
+          if(p.value > alpha) pp[[v]] = c(pp[[v]], p)
        # }
       }
     }
@@ -359,7 +361,7 @@ bestps = function(v, pset, pps, ppss, ms, max_parents, surv){
         }
       } # FIX against disconnected being best for survival outcome
       # print("tmp.score====")
-      # print(tmp.score)
+      # print(tmp.score)7
       if( tmp.score > best.score ){
         best.set = tmp.set
         best.score  = tmp.score
@@ -421,8 +423,8 @@ pp.sets.bs = function(pps, ppss, ms, max_parents, surv){
 swscore = function(s, w, pp, pps, bps){
   pset = w[ is.element( w, pp[[s]] ) ] # find possible parents of s in w
   l = length(pset)
-  #print("pps[[s]][[l]]===" )
-  #print(pps[[s]][[l]] )
+  print(s )
+  print(pset)
     aa = apply(pps[[s]][[l]],2,setequal,y=pset)
     best.ps = bps[[1]][[s]][[l]][aa]
     #print("best.ps===" )
@@ -546,7 +548,7 @@ sink2net = function(bnets, pp, pps, bps){
   rowno = 1
   for(c in 1:n.comp){
     tmpn = bnets[ is.element(bnets$component, c), ]
-    for(q in max(tmpn$k):2){ # REPLCED k by q
+    for(q in max(tmpn$k):min(tmpn$k)){ # REPLCED k by q, 2 by min(tmpn$k)
       bp.set = NULL
       tmp = tmpn[ is.element(tmpn$k, q), ]
       s = tmp[ 1, "sink"]

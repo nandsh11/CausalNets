@@ -6,7 +6,7 @@
 #' @return data.frame with 3 columns; from, to and component
 #' @export
 #'
-sfun = function(mydata, alpha = 0.01, genes, surdata=NULL, scoreFn = "bic", pheno = FALSE, alpha1 = 0.01, alpha2 = 0.01, pp = NULL){
+sfun = function(mydata, alpha = 0.01, genes, surdata=NULL, scoreFn = "bic", pheno = FALSE, alpha1 = 0.01, alpha2 = 0.01, pp = NULL, pOrd = NULL){
 
   print(scoreFn)
   cnames = colnames(mydata)
@@ -71,10 +71,12 @@ if(is.null(pp)){
   else{
     if(is.null(alpha)){
       if(n.var >40){
-        alpha = 0.0001
+        #alpha = 0.0001
+        alpha = 0.85
           }
       else {
-        alpha = 0.001
+        #alpha = 0.001
+        alpha = 0.85
           }
     }
     pp = mypp(mydata, alpha, n.var)
@@ -139,24 +141,45 @@ if(is.null(pp)){
   #save(pp,po,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_0.RData")
 
   max_parents = 2
-  pps = pp.sets(pp) # all sets of possible parents
+  if(!is.null(pOrd))
+    {
+    pps = pp.sets(pp)
+    #pps = pp.sets1(pp, pOrd) # all sets of possible parents
+  }
+  else{
+    pps = pp.sets(pp) # all sets of possible parents
+  }
   print("after pps")
-  #save(pp,po,pps,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_0.RData")
+  save(pp,po,pps,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_0.RData")
 
-  ppss = pp.sets.s(mydata, pps,surv,scoreFn) # scores for all sets of possible parents for each node
+  if(!is.null(pOrd))
+  {
+    ppss = pp.sets.s(mydata, pps,surv,scoreFn)
+    #ppss = pp.sets.s.pOrd(mydata, pps,surv,scoreFn, pOrd)
+  }
+  else{
+    ppss = pp.sets.s(mydata, pps,surv,scoreFn) # scores for all sets of possible parents for each node
+  }
+
   print("after ppss")
   bps = pp.sets.bs(pps, ppss, ms, max_parents, surv) # BEST parent sets and scores for all sets of possible parents for each node
   print("after bps")
-  #save(ms,pp,po,pps,ppss,bps,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_1.RData")
-
-  bsinks = bestSinks(pp, ms, po, pps, ppss, bps, mydata, surv) # best sinks for all possible connected components
+  save(ms,pp,po,pps,ppss,bps,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_1.RData")
+  if(!is.null(pOrd))
+  {
+    bsinks = bestSinksPartialOrds(pp, ms, po, pps, ppss, bps, mydata, surv,max_parents, pOrd)
+  }
+  else{
+    bsinks = bestSinks(pp, ms, po, pps, ppss, bps, mydata, surv) # best sinks for all possible connected components
+    #bsinks = bestSinks1(pp, ms, po, pps, ppss, bps, mydata, surv)
+  }
   #print(bsinks,quote = TRUE, row.names = FALSE)
   print("after bsinks")
 
   if(nrow(bsinks)>0){
-    bnets = bestnet(bsinks, n.var) # ordered best sinks for labeled connected components
-    print("after bnets")
-    print(bnets,quote = TRUE, row.names = FALSE)
+    #bnets = bestnet(bsinks, n.var) # ordered best sinks for labeled connected components
+    #print("after bnets")
+    #print(bnets,quote = TRUE, row.names = FALSE)
     #save(ms,pp,po,pps,ppss,bps,bsinks,bnets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_1.RData")
     # multiple best nets
     allNets = findAllBestNets(bsinks, n.var)
@@ -193,12 +216,8 @@ if(is.null(pp)){
     #mylinks = sink2net(bnets, pp, pps, bps) # network edges and labeled connected components
     print(multBestNets[[1]],quote = TRUE, row.names = FALSE)
     firstNet = multBestNets[[1]]
-    #save(feasS,mydata,ms,pp,po,pps,ppss,bps,bsinks,bnets,allNets,multBestNets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_2.RData")
-    #save(ms,pp,po,pps,ppss,bps,bsinks,bnets,mylinks,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/Orig5_BIC.RData")
+    save(feasS,mydata,ms,pp,po,pps,ppss,bps,bsinks,allNets,multBestNets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_2.RData")
 
-
-    #names(mylinks1)[1:2] = c("from", "to")
-    #names(mylinks11)[1:2] = c("from", "to")
     #print(mylinks1,quote = TRUE, row.names = FALSE)
     #print(mylinks11,quote = TRUE, row.names = FALSE)
 

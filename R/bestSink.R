@@ -17,15 +17,16 @@ bestSinks = function(pp, ms, po, pps, ppss, bps, mydata, surv){
     sinks.tmp[s, "sink"] = s
     sinks.tmp[s, "wscore"] = ms[s]
     }
-
+  sinks.tmp = round(sinks.tmp,4)
   mysinks = sinks.tmp
-  #print(mysinks)
-  #print(mysinks,quote = TRUE, row.names = FALSE)
+  print(mysinks)
+  print(mysinks,quote = TRUE, row.names = FALSE)
   bsinks = sinks.tmp[0, ] # names row
   #print(bsinks,quote = TRUE, row.names = FALSE)
 
   # best sinks and scores for subnetworks of size 2:m
   for(q in 2:m){
+    print(q)
     sinks.tmp1 = list()
     wscore <- windx <- k <- sink <- numeric(m*m)
     index <- 1
@@ -34,8 +35,11 @@ bestSinks = function(pp, ms, po, pps, ppss, bps, mydata, surv){
       w = subsetur(m, sinks.tmp[j, "windx"])
       w.networkscore = sinks.tmp[j, "wscore"]
       w1sinks = wsink.scores(w, w.networkscore, pp, po, pps, bps, m)
-
+      print("w1sinks")
+      print(w1sinks)
       index_subset <- seq_along(w1sinks$wscore)-1+index
+      print("index_subset")
+      print(index_subset)
       wscore[index_subset] <- w1sinks$wscore
       windx[index_subset] <- w1sinks$windx
       k[index_subset] <- w1sinks$k
@@ -46,6 +50,9 @@ bestSinks = function(pp, ms, po, pps, ppss, bps, mydata, surv){
                               windx = windx[seq_len(index-1)],
                               k = k[seq_len(index-1)],
                               sink = sink[seq_len(index-1)])
+    print(sinks.tmp1)
+    sinks.tmp1 = round(sinks.tmp1,4)
+    print(sinks.tmp1,quote = TRUE, row.names = FALSE)
     # break q loop if there are no more offspring for any sets
     if( nrow(sinks.tmp1) == 0 ) break
 
@@ -58,10 +65,14 @@ bestSinks = function(pp, ms, po, pps, ppss, bps, mydata, surv){
       tmp1 = tmp[ tmp$wscore >= max(tmp$wscore), ]
       bsinks = rbind( bsinks, tmp1 )
     }
+    print("bsinks11111111111111111111")
+    print(bsinks,quote = TRUE, row.names = FALSE)
     bsinks = unique(bsinks)
     sinks.tmp = bsinks[ is.element( bsinks$k, q ), ]
     # NEW Sep 29 -- remove duplicates in sinks.tmp - sink
-    sinks.tmp = sinks.tmp[ , -which(names(sinks.tmp) %in% c("sink"))]
+    #sinks.tmp = sinks.tmp[ , -which(names(sinks.tmp) %in% c("sink"))]
+    #print("bsinks22222222222222222")
+    #print(sinks.tmp,quote = TRUE, row.names = FALSE)
     sinks.tmp = unique(sinks.tmp)
     # NEW Sep 29 --keep only the row/rows with max score
     # for each subset with card q in sinks.tmp
