@@ -494,6 +494,7 @@ bestnet = function(bsinks, m){
     ks = unique( bsinks$k )
     ks = ks[order(ks, decreasing=TRUE)]
     q = max(ks) ###### change index k to q DONE
+    q1 = min(ks)
     aa = match(q, bsinks$k) ########!!!!!!! match gets only one row
     ######## aa gets only one top row which may not have max score
     tmp.s = bsinks[ aa, ]
@@ -503,14 +504,14 @@ bestnet = function(bsinks, m){
     # print(tmp.s[1, "windx"])
     myw = subsetur(m, tmp.s[1, "windx"]) # just pick 1st row
     w1 = myw[ !is.element(myw, tmp.s[1, "sink"]) ] # pick sink in the top row
-    w1indx = subsetr(m, w1)
+    w1indx = subsetr(m, w1) # myw w/o sink
 
     rowno = rowno + 1
     wlen = length(w1)
     #print("wlen===")
     #print(wlen)
     if(wlen >1){
-      for(d in wlen:2){
+      for(d in wlen:q1){ # FIX for partial - replaced 2 by q1
         aa = match(w1indx, bsinks$windx)
         tmp.s = bsinks[ aa, ]
         ######## aa gets only one top row which may not have max score
