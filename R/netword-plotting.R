@@ -27,7 +27,7 @@ netplot_jm = function(mylinks) {
   g <- igraph::graph_from_data_frame(links, directed=TRUE)
   print(g, e=TRUE, v=TRUE)
   #l <- layout_with_fr(g)
-  plot(g, edge.arrow.size=0.4, edge.color="grey50",
+  plot(g, edge.arrow.size=0.1, edge.color="grey50",
        vertex.color="gold", vertex.frame.color="darkred",
         vertex.label.color="black",
        vertex.size=30,vertex.label.dist=2,

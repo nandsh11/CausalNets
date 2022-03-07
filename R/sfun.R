@@ -6,8 +6,10 @@
 #' @return data.frame with 3 columns; from, to and component
 #' @export
 #'
-sfun = function(mydata, alpha = 0.01, genes, surdata=NULL, scoreFn = "bic", pheno = FALSE, alpha1 = 0.01, alpha2 = 0.01, pp = NULL, pOrd = NULL){
-
+sfun = function(mydata, alpha, surdata=NULL, scoreFn = "bic", pheno = FALSE, alpha1 = 0.01, alpha2 = 0.01, pp = NULL){
+  multBNs = FALSE
+  genes = NULL
+  pOrd = NULL
   print(scoreFn)
   cnames = colnames(mydata)
   #print(cnames)
@@ -15,6 +17,7 @@ sfun = function(mydata, alpha = 0.01, genes, surdata=NULL, scoreFn = "bic", phen
   surv = 0
   # survival processing
   if(!is.null(surdata)){
+    print("suuuuuuuu")
     mydata=cbind(mydata,surdata)
     n.var = ncol(mydata)
     n.var = n.var -1 # last col survival time
@@ -65,24 +68,17 @@ sfun = function(mydata, alpha = 0.01, genes, surdata=NULL, scoreFn = "bic", phen
 
   # non-survival processing
 if(is.null(pp)){
+  print("000000000")
   if (pheno == TRUE){
     pp = mypp1(mydata[-(n.var+1)], alpha1,alpha2, n.var, n.var) # phenotype based
   }
   else{
     if(is.null(alpha)){
-      if(n.var >40){
-        #alpha = 0.0001
-        alpha = 0.85
-          }
-      else {
-        #alpha = 0.001
-        alpha = 0.85
-          }
-    }
+      alpha = 0.85
+      }
     pp = mypp(mydata, alpha, n.var)
   }
-
-  # only po and pp members
+  print("111111")
   feasS = NULL
   i=1
   for (v in pp) {
@@ -98,9 +94,10 @@ if(is.null(pp)){
       feasS= unique(feasS)
       print(feasS)
       feasS= feasS[order(feasS)]
-      print(feasS)
       print("feasS#====")
       print(length(feasS))
+      print(feasS)
+
       pp1 = vector('list', length(feasS))
       i=1
       for (g in pp) {
@@ -177,52 +174,77 @@ if(is.null(pp)){
   print("after bsinks")
 
   if(nrow(bsinks)>0){
-    #bnets = bestnet(bsinks, n.var) # ordered best sinks for labeled connected components
-    #print("after bnets")
-    #print(bnets,quote = TRUE, row.names = FALSE)
-    #save(ms,pp,po,pps,ppss,bps,bsinks,bnets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_1.RData")
+    bnets = bestnet(bsinks, n.var) # ordered best sinks for labeled connected components
+    print("after bnets")
+    print(bnets,quote = TRUE, row.names = FALSE)
+    save(ms,pp,po,pps,ppss,bps,bsinks,bnets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_1.RData")
     # multiple best nets
-    allNets = findAllBestNets(bsinks, n.var)
+    if(multBNs == TRUE){
+      allNets = findAllBestNets(bsinks, n.var)
 
-    multBestNets = vector('list', length(allNets))
-    mylinks = NULL
-    mylinks1 = NULL
-    mylinks11 = NULL
-    for(i in 1:length(allNets)){
-      mylinks = sink2net(allNets[[i]], pp, pps, bps)
+      multBestNets = vector('list', length(allNets))
+      mylinks = NULL
+      mylinks1 = NULL
+      mylinks11 = NULL
+      for(i in 1:length(allNets)){
+        mylinks = sink2net(allNets[[i]], pp, pps, bps)
+        # mylinks has node numbers in feasS data;
+        # sources, sinks, mylinks1 has correct node numbers according to feasS;
+        # sources1, sinks1, mylinks11 has node names.
+        sources = list()
+        sources1 = list() # names
+        sources =feasS[mylinks[,"node.source"]]
+        sources1 =cnames[sources]
+        #print(sources)
+        sinks = list()
+        sinks1 = list() #names
+        sinks =feasS[mylinks[,"node.sink"]]
+        sinks1 =cnames[sinks]
+        #print(sinks)
+        mylinks1 = mylinks
+        mylinks11 = mylinks
+        mylinks1[,"node.source"] = sources
+
+        mylinks1[,"node.sink"] = sinks
+        mylinks11[,"node.source"] = sources1
+        mylinks11[,"node.sink"] = sinks1
+        print(mylinks11,quote = TRUE, row.names = FALSE)
+        multBestNets[[i]]= mylinks11
+        save(feasS,mydata,ms,pp,po,pps,ppss,bps,bsinks,allNets,multBestNets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_2.RData")
+      }
+
+      }
+    else {
       # mylinks has node numbers in feasS data;
       # sources, sinks, mylinks1 has correct node numbers according to feasS;
       # sources1, sinks1, mylinks11 has node names.
-      sources = list()
-      sources1 = list() # names
-      sources =feasS[mylinks[,"node.source"]]
-      sources1 =cnames[sources]
-      #print(sources)
-      sinks = list()
-      sinks1 = list() #names
-      sinks =feasS[mylinks[,"node.sink"]]
-      sinks1 =cnames[sinks]
-      #print(sinks)
-      mylinks1 = mylinks
-      mylinks11 = mylinks
-      mylinks1[,"node.source"] = sources
+      mylinks = sink2net(bnets, pp, pps, bps)
+        sources = list()
+        sources1 = list() # names
+        sources =feasS[mylinks[,"node.source"]]
+        sources1 =cnames[sources]
+        #print(sources)
+        sinks = list()
+        sinks1 = list() #names
+        sinks =feasS[mylinks[,"node.sink"]]
+        sinks1 =cnames[sinks]
+        #print(sinks)
+        mylinks1 = mylinks
+        mylinks11 = mylinks
+        mylinks1[,"node.source"] = sources
 
-      mylinks1[,"node.sink"] = sinks
-      mylinks11[,"node.source"] = sources1
-      mylinks11[,"node.sink"] = sinks1
-      print(mylinks11,quote = TRUE, row.names = FALSE)
-      multBestNets[[i]]= mylinks11
+        mylinks1[,"node.sink"] = sinks
+        mylinks11[,"node.source"] = sources1
+        mylinks11[,"node.sink"] = sinks1
+
+        print(mylinks1,quote = TRUE, row.names = FALSE)
+        print(mylinks11,quote = TRUE, row.names = FALSE)
     }
-    #mylinks = sink2net(bnets, pp, pps, bps) # network edges and labeled connected components
-    print(multBestNets[[1]],quote = TRUE, row.names = FALSE)
-    firstNet = multBestNets[[1]]
-    save(feasS,mydata,ms,pp,po,pps,ppss,bps,bsinks,allNets,multBestNets,file = "/Users/nandshar/Josh/GOBnilp/pygobnilp-1.0/TestDS/current_2.RData")
-
-    #print(mylinks1,quote = TRUE, row.names = FALSE)
-    #print(mylinks11,quote = TRUE, row.names = FALSE)
 
   }
-  return(multBestNets)
-  #return(mylinks1) # links1 has numbers, mylinks11 has node names
+  if(multBNs == TRUE){
+      return(multBestNets)
+    }else
+      return(mylinks11) # links1 has numbers, mylinks11 has node names
 } # end sfun
 

@@ -43,9 +43,10 @@ library(CausalNets)
 
 # simulate data
 set.seed(1234)
-mydata = simdat(n_var = 5)
+mydata = simdat(n_var = 6)
 # causnet results
-links.s = sfun(mydata, alpha = 1)
+#links.s = sfun(mydata, alpha = 1)
+links.s = sfun(mydata, alpha = 1, pOrd = 3)
 links.s[[1]]
 
 
