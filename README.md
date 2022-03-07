@@ -1,25 +1,35 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # causnet
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
-The goal of causNet is to …
+The goal of causnet is to ...
 
 ## Installation
 
 You can install the development version from GitHub with:
 
-``` r
+```{r installation, eval=FALSE}
 require("devtools")
-install_github("USCbiostats/causnet")
+
 ```
 
-\~You can install the released version of causnet from
-[CRAN](https://CRAN.R-project.org) with:\~
+
 
 ``` r
 install.packages("causnet")
@@ -27,20 +37,19 @@ install.packages("causnet")
 
 ## Example
 
-``` r
-library(causnet)
+```{r}
+library(CausalNets)
 
 # simulate data
 set.seed(1234)
-mydata = simdat(n.var = 5)
+mydata = simdat(300,5,1)
+# run Causnet
+links.s = sfun(mydata, alpha = 0.5, surdata=NULL, scoreFn = "bic", pheno = FALSE, alpha1 = 0.01, alpha2 = 0.01, pp = NULL)
 
-# causnet results
-links.s = sfun(mydata, alpha = 1)
-
-links.s
 
 
 netplot_jm(links.s)
-
 ```
+
+
 
