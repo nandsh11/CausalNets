@@ -78,97 +78,6 @@ mypp1 = function(mydata, alpha1, alpha2, n.var, y){
   return(pp)
 } # end mypp
 
-#phenotype driven pp surv
-# mypp_surv = function(mydata, genes, alpha1, alpha2){
-#   n.var = ncol(mydata)
-#   n.var = n.var -1 # last col survival time
-#   pval = NULL
-#   i=0
-#
-#   for (g in genes){
-#     i=i+1
-#     #print(i)
-#     f = coxph(Surv(as.numeric(unlist(mydata["Time"])),
-#                    as.numeric(unlist((mydata["Status"]))))
-#               ~  as.matrix(mydata["Stage"])
-#               + as.matrix(mydata["Age"]) +as.matrix(mydata[g])
-#               + strata(mydata["Site"]),
-#               mydata)
-#     an = anova(f)
-#     pval = c(pval,an$`Pr(>|Chi|)`[4])
-#   }
-#   pval1=p.adjust(pval, "BH")
-#   ppDis = NULL
-#   i=0
-#   for (k in pval1){ # fixed pval1
-#     i = i+1
-#     if (k < alpha1) ppDis = c(ppDis,i) # 0.0001 gives 195 genes, all top 5 in
-#     # 1e-20,22 --18,14(3 top5), 1e-23- 11, 1e-25 -7(1 in top5 ZFHX4)
-#     # 1e-24 -5(1 in top5 ZFHX4), 1e-30 -2(0 in top5)
-#   }
-#   sGenes = genes[ppDis]
-#   parentsDis = ppDis # col numbers in genes
-#
-#   mydata1 = mydata[genes]
-#   mydata=cbind(mydata1,surdata)
-#   cnames = colnames(mydata)
-#   n.var = ncol(mydata)
-#   surv = 0
-#   if(!is.null(surdata)){
-#     n.var = n.var -1 # last col survival time
-#     surv = 1
-#   }
-#
-#   pp = vector('list', n.var)
-#   nSubset1 = parentsDis
-#   y = n.var
-#   pp[[y]] = nSubset1
-#   alpha2 = 0.5 # 0.85 -- 9,3,7 parents, 5 of dis
-#   lengs = NULL
-#   nSubset2 = NULL
-#   for(r in nSubset1){
-#     for(q in 1:(n.var-1)){# not including outcome variable
-#       if(q != r){
-#         #p.value = cor.test(mydata[, q], mydata[, r])$p.value
-#         p.value = cor(mydata[, r], mydata[, q])
-#
-#         if(p.value > alpha2){
-#           pp[[r]] = c(pp[[r]], q)
-#           nSubset2 = c(nSubset2,q)
-#         }
-#       }
-#
-#     }
-#     if(!is.null(pp[[r]])){
-#       #print(r)
-#       lengs = c(lengs,length(pp[[r]]))
-#     }
-#   }
-#   nSubset3 = NULL
-#   for(r1 in nSubset2){
-#     for(q1 in 1:(n.var-1)){# not including outcome variable
-#       if(q1 != r1 && !(q1 %in% nSubset1)){
-#         #p.value = cor.test(mydata[, q], mydata[, r])$p.value
-#         p.value = cor(mydata[, r1], mydata[, q1])
-#
-#         if(p.value > alpha2){
-#           pp[[r1]] = c(pp[[r1]], q1)
-#           nSubset3 = c(nSubset3,q1)
-#         }
-#       }
-#
-#     }
-#     if(!is.null(pp[[r1]])){
-#       #print(r1)
-#       lengs = c(lengs,length(pp[[r1]]))
-#     }
-#   }
-#
-#
-#   return( pp )
-#
-# }
-#
 
 mypp_surv = function(mydata, genes, alpha1, alpha2){
   n.var = ncol(mydata)
@@ -214,19 +123,19 @@ mypp_surv = function(mydata, genes, alpha1, alpha2){
   nSubset1 = parentsDis
   y = n.var
   pp[[y]] = nSubset1
-  alpha2 = 0.85 # 0.85 -- 9,3,7 parents, 5 of dis
+  #alpha2 = 0.85 # 0.85 -- 9,3,7 parents, 5 of dis
 
   for(v in 1:(n.var-1)){
     for(p in 1:(n.var-1)){
       if(p != v){
-        print(v)
-        print(p)
+        #print(v)
+        #print(p)
         #if(p == n.var){}else{ # last node phenotype outout- not a parent
         #p.value = cor.test(mydata[, v], mydata[, p])$p.value
         p.value = cor(mydata[, v], mydata[, p])
         #p.value = cor.test(mydata[, v], mydata[, p])$estimate
         #if(p.value < alpha) pp[[v]] = c(pp[[v]], p)
-        print(p.value)
+        #print(p.value)
         if(p.value > alpha2) pp[[v]] = c(pp[[v]], p)
         # }
       }
@@ -492,8 +401,8 @@ pp.sets.bs = function(pps, ppss, ms, max_parents, surv){
 swscore = function(s, w, pp, pps, bps){
   pset = w[ is.element( w, pp[[s]] ) ] # find possible parents of s in w
   l = length(pset)
-  print(s )
-  print(pset)
+  #print(s )
+  #print(pset)
     aa = apply(pps[[s]][[l]],2,setequal,y=pset)
     best.ps = bps[[1]][[s]][[l]][aa]
     #print("best.ps===" )
